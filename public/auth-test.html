@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Auth Test</title>
+    <style>
+      :root {
+        --bg: #f4efe7;
+        --card: rgba(255, 252, 246, 0.88);
+        --line: #d8cab6;
+        --text: #2f2419;
+        --muted: #6c5a48;
+        --accent: #b3572f;
+        --accent-dark: #7d3111;
+        --success: #1f7a4c;
+        --danger: #b42318;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top left, rgba(179, 87, 47, 0.16), transparent 30%),
+          linear-gradient(135deg, #f4efe7, #e8dcc7 48%, #f7f0e8);
+        min-height: 100vh;
+      }
+
+      .page {
+        width: min(1120px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 32px 0 48px;
+      }
+
+      .hero {
+        margin-bottom: 24px;
+      }
+
+      .eyebrow {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: rgba(47, 36, 25, 0.08);
+        color: var(--muted);
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 14px 0 10px;
+        font-size: clamp(32px, 6vw, 58px);
+        line-height: 0.96;
+      }
+
+      .subtitle {
+        max-width: 680px;
+        color: var(--muted);
+        font-size: 17px;
+        line-height: 1.6;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .panel {
+        background: var(--card);
+        border: 1px solid rgba(216, 202, 182, 0.9);
+        border-radius: 24px;
+        backdrop-filter: blur(12px);
+        box-shadow: 0 22px 60px rgba(58, 37, 21, 0.08);
+        padding: 22px;
+      }
+
+      .panel h2 {
+        margin: 0 0 8px;
+        font-size: 24px;
+      }
+
+      .panel p {
+        margin: 0 0 18px;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      form {
+        display: grid;
+        gap: 12px;
+      }
+
+      label {
+        display: grid;
+        gap: 6px;
+        font-size: 14px;
+      }
+
+      input,
+      textarea,
+      button {
+        font: inherit;
+      }
+
+      input {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 13px 14px;
+        background: rgba(255, 255, 255, 0.7);
+        color: var(--text);
+      }
+
+      input:focus {
+        outline: 2px solid rgba(179, 87, 47, 0.25);
+        border-color: var(--accent);
+      }
+
+      button {
+        border: 0;
+        border-radius: 14px;
+        padding: 13px 16px;
+        cursor: pointer;
+        transition: transform 140ms ease, opacity 140ms ease;
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+      }
+
+      .primary {
+        background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+        color: #fff8f2;
+      }
+
+      .secondary {
+        background: rgba(47, 36, 25, 0.08);
+        color: var(--text);
+      }
+
+      .stack {
+        display: grid;
+        gap: 12px;
+      }
+
+      .token-box {
+        min-height: 220px;
+        border-radius: 18px;
+        padding: 16px;
+        background: rgba(47, 36, 25, 0.92);
+        color: #f8f3ec;
+        overflow: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-family: Consolas, monospace;
+        font-size: 13px;
+      }
+
+      .message {
+        border-radius: 16px;
+        padding: 14px 16px;
+        font-size: 14px;
+      }
+
+      .message.success {
+        background: rgba(31, 122, 76, 0.12);
+        color: var(--success);
+      }
+
+      .message.error {
+        background: rgba(180, 35, 24, 0.1);
+        color: var(--danger);
+      }
+
+      .inline-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .help {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .link-card {
+        border: 1px dashed var(--line);
+        border-radius: 16px;
+        padding: 14px;
+        background: rgba(255, 255, 255, 0.45);
+      }
+
+      .link-card a {
+        color: var(--accent-dark);
+        word-break: break-all;
+      }
+
+      @media (max-width: 860px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <span class="eyebrow">social app backend test</span>
+        <h1>Try Local Auth and Google Auth From One Page</h1>
+        <p class="subtitle">
+          Use this page to test sign up, login, email confirmation, refresh token,
+          logout, and Sign in with Google against your current backend.
+        </p>
+      </section>
+
+      <section class="grid">
+        <article class="panel">
+          <h2>Local Sign Up</h2>
+          <p>Create a user and get the confirmation link immediately.</p>
+          <form id="signup-form">
+            <label>
+              Name
+              <input name="name" placeholder="Effat" required />
+            </label>
+            <label>
+              Email
+              <input name="email" type="email" placeholder="effat@example.com" required />
+            </label>
+            <label>
+              Password
+              <input name="password" type="password" placeholder="123456" required />
+            </label>
+            <label>
+              Phone
+              <input name="phone" placeholder="01012345678" />
+            </label>
+            <label>
+              Age
+              <input name="age" type="number" min="18" max="60" placeholder="22" />
+            </label>
+            <button class="primary" type="submit">Create Account</button>
+          </form>
+          <div id="confirmation-link" class="link-card" hidden>
+            <strong>Confirmation link</strong>
+            <div><a id="confirmation-anchor" href="#" target="_blank" rel="noreferrer"></a></div>
+          </div>
+        </article>
+
+        <article class="panel">
+          <h2>Local Login</h2>
+          <p>Login with email and password to receive access and refresh tokens.</p>
+          <form id="login-form">
+            <label>
+              Email
+              <input name="email" type="email" placeholder="effat@example.com" required />
+            </label>
+            <label>
+              Password
+              <input name="password" type="password" placeholder="123456" required />
+            </label>
+            <button class="primary" type="submit">Login</button>
+          </form>
+          <div class="stack" style="margin-top: 18px;">
+            <div id="google-zone" class="stack">
+              <button id="load-google-btn" class="secondary" type="button">Load Google Sign In</button>
+              <div id="google-button"></div>
+              <div class="help">Put a real `GOOGLE_CLIENT_ID` in `.env`, then reload the page.</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel">
+          <h2>Session Actions</h2>
+          <p>Use the tokens stored from login or Google login to test secured routes.</p>
+          <div class="inline-actions">
+            <button id="profile-btn" class="secondary" type="button">Get Profile</button>
+            <button id="admin-btn" class="secondary" type="button">Admin Route</button>
+            <button id="refresh-btn" class="secondary" type="button">Refresh Token</button>
+            <button id="logout-btn" class="secondary" type="button">Logout</button>
+          </div>
+          <p class="help" style="margin-top: 14px;">
+            Tokens are stored in memory on this page after a successful login.
+          </p>
+        </article>
+
+        <article class="panel">
+          <h2>Forgot Password</h2>
+          <p>Generate a reset link, then paste its token below to set a new password.</p>
+          <form id="forgot-password-form">
+            <label>
+              Email
+              <input name="email" type="email" placeholder="effat@example.com" required />
+            </label>
+            <button class="secondary" type="submit">Generate Reset Link</button>
+          </form>
+          <div id="reset-link-card" class="link-card" style="margin-top: 14px;" hidden>
+            <strong>Reset link</strong>
+            <div><a id="reset-link-anchor" href="#" target="_blank" rel="noreferrer"></a></div>
+          </div>
+          <form id="reset-password-form" style="margin-top: 18px;">
+            <label>
+              Reset Token
+              <input name="token" placeholder="Paste token from reset link" required />
+            </label>
+            <label>
+              New Password
+              <input name="newPassword" type="password" placeholder="new password" required />
+            </label>
+            <label>
+              Confirm Password
+              <input name="confirmPassword" type="password" placeholder="confirm password" required />
+            </label>
+            <button class="primary" type="submit">Reset Password</button>
+          </form>
+        </article>
+
+        <article class="panel">
+          <h2>Response Viewer</h2>
+          <p>Every request result will show up here so you can inspect the backend flow.</p>
+          <div id="message-box" class="message success">Ready.</div>
+          <div id="response-box" class="token-box" style="margin-top: 14px;">No response yet.</div>
+        </article>
+      </section>
+    </main>
+
+    <script>
+      const state = {
+        accessToken: "",
+        refreshToken: "",
+        googleClientId: ""
+      };
+
+      const messageBox = document.getElementById("message-box");
+      const responseBox = document.getElementById("response-box");
+      const confirmationCard = document.getElementById("confirmation-link");
+      const confirmationAnchor = document.getElementById("confirmation-anchor");
+      const resetLinkCard = document.getElementById("reset-link-card");
+      const resetLinkAnchor = document.getElementById("reset-link-anchor");
+      const googleButton = document.getElementById("google-button");
+      const loadGoogleBtn = document.getElementById("load-google-btn");
+
+      const setMessage = (text, kind = "success") => {
+        messageBox.textContent = text;
+        messageBox.className = `message ${kind}`;
+      };
+
+      const renderResponse = (data) => {
+        responseBox.textContent = JSON.stringify(data, null, 2);
+      };
+
+      const storeTokens = (data) => {
+        if (data.accessToken) {
+          state.accessToken = data.accessToken;
+        }
+
+        if (data.refreshToken) {
+          state.refreshToken = data.refreshToken;
+        }
+      };
+
+      const request = async (url, options = {}) => {
+        const response = await fetch(url, {
+          headers: {
+            "Content-Type": "application/json",
+            ...(options.headers || {})
+          },
+          ...options
+        });
+
+        const data = await response.json().catch(() => ({
+          message: "No JSON response"
+        }));
+
+        renderResponse(data);
+
+        if (!response.ok) {
+          throw new Error(data.message || "Request failed");
+        }
+
+        return data;
+      };
+
+      const handleSuccess = (data, fallbackMessage) => {
+        storeTokens(data);
+        setMessage(data.message || fallbackMessage, "success");
+      };
+
+      document.getElementById("signup-form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(event.currentTarget);
+        const payload = {
+          name: formData.get("name"),
+          email: formData.get("email"),
+          password: formData.get("password"),
+          phone: formData.get("phone") || undefined,
+          age: formData.get("age") ? Number(formData.get("age")) : undefined
+        };
+
+        try {
+          const data = await request("/api/auth/sign-up", {
+            method: "POST",
+            body: JSON.stringify(payload)
+          });
+
+          handleSuccess(data, "Sign up successful");
+
+          if (data.confirmationLink) {
+            confirmationCard.hidden = false;
+            confirmationAnchor.href = data.confirmationLink;
+            confirmationAnchor.textContent = data.confirmationLink;
+          }
+        } catch (error) {
+          setMessage(error.message, "error");
+        }
+      });
+
+      document.getElementById("login-form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(event.currentTarget);
+        const payload = {
+          email: formData.get("email"),
+          password: formData.get("password")
+        };
+
+        try {
+          const data = await request("/api/auth/login", {
+            method: "POST",
+            body: JSON.stringify(payload)
+          });
+
+          handleSuccess(data, "Login successful");
+        } catch (error) {
+          setMessage(error.message, "error");
+        }
+      });
+
+      document.getElementById("forgot-password-form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(event.currentTarget);
+
+        try {
+          const data = await request("/api/auth/forgot-password", {
+            method: "POST",
+            body: JSON.stringify({
+              email: formData.get("email")
+            })
+          });
+
+          handleSuccess(data, "Reset link generated");
+
+          if (data.resetLink) {
+            resetLinkCard.hidden = false;
+            resetLinkAnchor.href = data.resetLink;
+            resetLinkAnchor.textContent = data.resetLink;
+          }
+        } catch (error) {
+          setMessage(error.message, "error");
+        }
+      });
+
+      document.getElementById("reset-password-form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(event.currentTarget);
+
+        try {
+          const data = await request("/api/auth/reset-password", {
+            method: "POST",
+            body: JSON.stringify({
+              token: formData.get("token"),
+              newPassword: formData.get("newPassword"),
+              confirmPassword: formData.get("confirmPassword")
+            })
+          });
+
+          handleSuccess(data, "Password reset successful");
+        } catch (error) {
+          setMessage(error.message, "error");
+        }
+      });
+
+      document.getElementById("profile-btn").addEventListener("click", async () => {
+        try {
+          const data = await request("/api/auth/profile", {
+            headers: {
+              Authorization: `Bearer ${state.accessToken}`
+            }
+          });
+
+          handleSuccess(data, "Profile fetched");
+        } catch (error) {
+          setMessage(error.message, "error");
+        }
+      });
+
+      document.getElementById("admin-btn").addEventListener("click", async () => {
+        try {
+          const data = await request("/api/auth/admin", {
+            headers: {
+              Authorization: `Bearer ${state.accessToken}`
+            }
+          });
+
+          handleSuccess(data, "Admin route reached");
+        } catch (error) {
+          setMessage(error.message, "error");
+        }
+      });
+
+      document.getElementById("refresh-btn").addEventListener("click", async () => {
+        try {
+          const data = await request("/api/auth/refresh-token", {
+            method: "POST",
+            body: JSON.stringify({
+              refreshToken: state.refreshToken
+            })
+          });
+
+          handleSuccess(data, "Token refreshed");
+        } catch (error) {
+          setMessage(error.message, "error");
+        }
+      });
+
+      document.getElementById("logout-btn").addEventListener("click", async () => {
+        try {
+          const data = await request("/api/auth/logout", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${state.accessToken}`
+            }
+          });
+
+          state.accessToken = "";
+          state.refreshToken = "";
+          handleSuccess(data, "Logged out");
+        } catch (error) {
+          setMessage(error.message, "error");
+        }
+      });
+
+      const initGoogleSignIn = async () => {
+        try {
+          const config = await request("/api/auth/google-config");
+          state.googleClientId = config.clientId;
+
+          if (!state.googleClientId) {
+            setMessage("Set GOOGLE_CLIENT_ID in .env, restart the server, then reload.", "error");
+            return;
+          }
+
+          if (!window.google || !window.google.accounts || !window.google.accounts.id) {
+            setMessage("Google script is not ready yet. Try again in a second.", "error");
+            return;
+          }
+
+          google.accounts.id.initialize({
+            client_id: state.googleClientId,
+            callback: async (response) => {
+              try {
+                const data = await request("/api/auth/google", {
+                  method: "POST",
+                  body: JSON.stringify({
+                    idToken: response.credential
+                  })
+                });
+
+                handleSuccess(data, "Google login successful");
+              } catch (error) {
+                setMessage(error.message, "error");
+              }
+            }
+          });
+
+          googleButton.innerHTML = "";
+          google.accounts.id.renderButton(googleButton, {
+            theme: "outline",
+            size: "large",
+            shape: "pill",
+            text: "continue_with",
+            width: 280
+          });
+
+          setMessage("Google Sign In is ready.", "success");
+        } catch (error) {
+          setMessage(error.message, "error");
+        }
+      };
+
+      loadGoogleBtn.addEventListener("click", initGoogleSignIn);
+    </script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+  </body>
+</html>
