@@ -1,5 +1,4 @@
 import mongoose, {
-  CallbackWithoutResultAndOptionalError,
   Document,
   Query,
   Schema,
@@ -12,6 +11,10 @@ export interface IPost extends Document {
   image?: string;
   author: Types.ObjectId;
   commentsCount: number;
+  reactions: {
+    user: Types.ObjectId;
+    emoji: "like" | "love" | "haha" | "wow" | "sad" | "angry";
+  }[];
   isDeleted: boolean;
   deletedAt?: Date;
 }
@@ -81,6 +84,20 @@ const postSchema = new Schema<IPost>(
       type: Number,
       default: 0
     },
+    reactions: [
+      {
+        user: {
+          type: Schema.Types.ObjectId,
+          ref: "User",
+          required: true
+        },
+        emoji: {
+          type: String,
+          enum: ["like", "love", "haha", "wow", "sad", "angry"],
+          required: true
+        }
+      }
+    ],
     isDeleted: {
       type: Boolean,
       default: false
@@ -99,15 +116,10 @@ const addPostHook = postSchema.post.bind(postSchema) as any;
 
 addPreHook(
   "validate",
-  function (
-    this: IPost,
-    next: CallbackWithoutResultAndOptionalError
-  ) {
+  function (this: IPost) {
     if (typeof this.content === "string") {
       this.content = this.content.trim();
     }
-
-    next();
   }
 );
 
@@ -118,14 +130,11 @@ addPostHook("validate", function (this: IPost) {
 });
 
 addPreHook("save", function (
-  this: IPost,
-  next: CallbackWithoutResultAndOptionalError
+  this: IPost
 ) {
   if (this.isModified("content") && typeof this.content === "string") {
     this.content = this.content.trim();
   }
-
-  next();
 });
 
 addPostHook("save", function (this: IPost) {
@@ -133,43 +142,30 @@ addPostHook("save", function (this: IPost) {
 });
 
 addPreHook(/^find/, function (
-  this: PostQuery,
-  next: CallbackWithoutResultAndOptionalError
+  this: PostQuery
 ) {
   excludeSoftDeleted.call(this as PostQuery);
-  next();
 });
 
 addPreHook(
   "updateOne",
-  function (
-    this: PostQuery,
-    next: CallbackWithoutResultAndOptionalError
-  ) {
+  function (this: PostQuery) {
     excludeSoftDeleted.call(this);
     normalizePostUpdate(this.getUpdate() as UpdateQuery<IPost>);
-    next();
   }
 );
 
 addPreHook(
   "findOneAndUpdate",
-  function (
-    this: PostQuery,
-    next: CallbackWithoutResultAndOptionalError
-  ) {
+  function (this: PostQuery) {
     excludeSoftDeleted.call(this);
     normalizePostUpdate(this.getUpdate() as UpdateQuery<IPost>);
-    next();
   }
 );
 
 addPreHook(
   "deleteOne",
-  function (
-    this: PostQuery & { op?: string },
-    next: CallbackWithoutResultAndOptionalError
-  ) {
+  function (this: PostQuery & { op?: string }) {
     const query = this;
 
     excludeSoftDeleted.call(query);
@@ -180,7 +176,6 @@ addPreHook(
       }
     });
     query.op = "updateOne";
-    next();
   }
 );
 

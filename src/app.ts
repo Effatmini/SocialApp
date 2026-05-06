@@ -5,8 +5,10 @@ import multer from "multer";
 import path from "path";
 import connectDB from "./config/db";
 import authRoutes from "./routes/auth.routes";
+import graphqlRoutes from "./routes/graphql.routes";
 import notificationRoutes from "./routes/notification.routes";
 import postRoutes from "./routes/post.routes";
+import storyRoutes from "./routes/story.routes";
 
 dotenv.config();
 
@@ -24,8 +26,10 @@ app.use("/uploads", express.static(uploadsDir));
 connectDB();
 
 app.use("/api/auth", authRoutes);
+app.use("/graphql", graphqlRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/posts", postRoutes);
+app.use("/api/stories", storyRoutes);
 
 app.get("/", (_req, res) => {
   res.sendFile(path.join(publicDir, "auth-test.html"));

@@ -4,8 +4,10 @@ import multer from "multer";
 import { Request } from "express";
 
 const uploadsDir = path.join(__dirname, "..", "..", "uploads", "users");
+const storyUploadsDir = path.join(__dirname, "..", "..", "uploads", "stories");
 
 fs.mkdirSync(uploadsDir, { recursive: true });
+fs.mkdirSync(storyUploadsDir, { recursive: true });
 
 const storage = multer.diskStorage({
   destination: (_req: Request, _file: Express.Multer.File, cb) => {
@@ -45,3 +47,22 @@ export const uploadUserImages = multer({
   { name: "cover", maxCount: 1 },
   { name: "coverPhoto", maxCount: 1 }
 ]);
+
+const storyStorage = multer.diskStorage({
+  destination: (_req: Request, _file: Express.Multer.File, cb) => {
+    cb(null, storyUploadsDir);
+  },
+  filename: (_req: Request, file: Express.Multer.File, cb) => {
+    const timestamp = Date.now();
+    const safeName = file.originalname.replace(/\s+/g, "-");
+    cb(null, `${timestamp}-${safeName}`);
+  }
+});
+
+export const uploadStoryMedia = multer({
+  storage: storyStorage,
+  fileFilter,
+  limits: {
+    fileSize: 10 * 1024 * 1024
+  }
+}).single("media");

@@ -1,0 +1,125 @@
+type User {
+  id: ID
+  _id: ID
+  name: String
+  email: String
+  profileImage: String
+  coverImage: String
+  picture: String
+  role: String
+  authProvider: String
+  isEmailConfirmed: Boolean
+  createdAt: String
+  updatedAt: String
+}
+
+type ReactionCountMap {
+  like: Int
+  love: Int
+  haha: Int
+  wow: Int
+  sad: Int
+  angry: Int
+}
+
+type Post {
+  id: ID
+  _id: ID
+  content: String
+  image: String
+  author: User
+  commentsCount: Int
+  reactionsCount: Int
+  reactionCounts: ReactionCountMap
+  myReaction: String
+  createdAt: String
+  updatedAt: String
+}
+
+type Comment {
+  id: ID
+  _id: ID
+  content: String
+  author: User
+  post: ID
+  createdAt: String
+  updatedAt: String
+}
+
+type Story {
+  id: ID
+  _id: ID
+  author: User
+  text: String
+  media: String
+  backgroundColor: String
+  expiresAt: String
+  createdAt: String
+  updatedAt: String
+}
+
+type Notification {
+  id: ID
+  _id: ID
+  recipient: ID
+  sender: User
+  post: Post
+  comment: ID
+  type: String
+  message: String
+  isRead: Boolean
+  createdAt: String
+}
+
+type Pagination {
+  page: Int
+  limit: Int
+  total: Int
+  totalPages: Int
+}
+
+type NewsFeedResult {
+  posts: [Post!]!
+  pagination: Pagination
+}
+
+type ProfilePostsResult {
+  user: User
+  posts: [Post!]!
+  pagination: Pagination
+}
+
+type PostDetailsResult {
+  post: Post
+  comments: [Comment!]!
+}
+
+type DashboardStats {
+  myPostsCount: Int
+  myCommentsCount: Int
+  unreadNotificationsCount: Int
+}
+
+type DashboardResult {
+  user: User
+  stats: DashboardStats
+  recentPosts: [Post!]!
+}
+
+type Query {
+  me: User
+  newsFeed(page: Int, limit: Int): NewsFeedResult!
+  profilePosts(userId: ID, page: Int, limit: Int): ProfilePostsResult!
+  dashboard: DashboardResult!
+  post(id: ID!): PostDetailsResult!
+  notifications: [Notification!]!
+  activeStories: [Story!]!
+}
+
+type Mutation {
+  createPost(content: String!, image: String): Post!
+  addComment(postId: ID!, content: String!): Comment!
+  reactToPost(postId: ID!, emoji: String!): Post!
+  removeReaction(postId: ID!): Post!
+  createStory(text: String, media: String, backgroundColor: String): Story!
+}
