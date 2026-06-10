@@ -6,6 +6,7 @@ import path from "path";
 import connectDB from "./config/db";
 import authRoutes from "./routes/auth.routes";
 import graphqlRoutes from "./routes/graphql.routes";
+import chatRoutes from "./modules/chat/routes/chat.routes";
 import notificationRoutes from "./routes/notification.routes";
 import postRoutes from "./routes/post.routes";
 import storyRoutes from "./routes/story.routes";
@@ -30,6 +31,7 @@ app.use("/graphql", graphqlRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/stories", storyRoutes);
+app.use("/api/chat", chatRoutes);
 
 app.get("/", (_req, res) => {
   res.sendFile(path.join(publicDir, "auth-test.html"));
